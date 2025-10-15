@@ -65,8 +65,7 @@ http://localhost:5000
   - *Нажмите "Сгенерировать пароль"*
 
 
-width="927" height="775" alt="image" src="https://github.com/user-attachments/assets/d0ffe244-eb17-48f5-8d10-cd9ede116270" />
-" />
+<ing width="927" height="775" alt="image" src="https://github.com/user-attachments/assets/d0ffe244-eb17-48f5-8d10-cd9ede116270" />
 
 
 # Структура проекта
