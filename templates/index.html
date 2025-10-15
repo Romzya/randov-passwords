@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор случайных паролей</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Генератор случайных паролей</h1>
+            <p>Создавайте безопасные пароли за секунды</p>
+        </header>
+
+        <main>
+            <div class="generator-card">
+                <div class="controls">
+                    <div class="input-group">
+                        <label for="length">Длина пароля: <span class="length-display">12</span></label>
+                        <input type="range" id="length" min="4" max="50" value="12" class="length-slider">
+                        <div class="length-value">
+                            <span id="lengthDisplay">12</span> символов
+                        </div>
+                    </div>
+
+                    <div class="difficulty-group">
+                        <label>Сложность:</label>
+                        <div class="radio-buttons">
+                            <label class="radio-option">
+                                <input type="radio" name="difficulty" value="easy" checked>
+                                <span class="radio-custom"></span>
+                                Легкая
+                                <span class="difficulty-indicator difficulty-easy">A-Za-z</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="difficulty" value="hard">
+                                <span class="radio-custom"></span>
+                                Сложная
+                                <span class="difficulty-indicator difficulty-hard">A-Za-z0-9!@#</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button id="generateBtn" class="generate-btn">
+                        <span class="btn-text">Сгенерировать пароль</span>
+                        <span class="btn-loading" style="display: none;">Генерация...</span>
+                    </button>
+                </div>
+
+                <div class="result" id="result" style="display: none;">
+                    <label>Ваш пароль:</label>
+                    <div class="password-display">
+                        <span id="passwordText"></span>
+                        <button class="copy-btn" onclick="copyPassword()" title="Скопировать">
+                            📋
+                        </button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="password-strength-fill" id="strengthFill"></div>
+                    </div>
+                    <div class="password-info" id="passwordInfo"></div>
+                </div>
+
+                <div class="tips">
+                    <h3>📝 Советы по безопасности:</h3>
+                    <ul>
+                        <li>Используйте разные пароли для разных сервисов</li>
+                        <li>Регулярно меняйте пароли</li>
+                        <li>Не используйте личную информацию в паролях</li>
+                        <li>Храните пароли в надежном месте</li>
+                    </ul>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Элементы DOM
+        const lengthSlider = document.getElementById('length');
+        const lengthDisplay = document.getElementById('lengthDisplay');
+        const generateBtn = document.getElementById('generateBtn');
+        const resultDiv = document.getElementById('result');
+        const passwordText = document.getElementById('passwordText');
+        const passwordInfo = document.getElementById('passwordInfo');
+        const strengthFill = document.getElementById('strengthFill');
+        const btnText = document.querySelector('.btn-text');
+        const btnLoading = document.querySelector('.btn-loading');
+
+        // Обновление отображения длины
+        lengthSlider.addEventListener('input', function() {
+            lengthDisplay.textContent = this.value;
+        });
+
+        // Генерация пароля
+        generateBtn.addEventListener('click', function() {
+            const length = parseInt(lengthSlider.value);
+            const difficulty = document.querySelector('input[name="difficulty"]:checked').value;
+
+            // Показываем индикатор загрузки
+            btnText.style.display = 'none';
+            btnLoading.style.display = 'inline';
+            generateBtn.disabled = true;
+
+            // AJAX запрос к серверу
+            fetch('/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    length: length,
+                    difficulty: difficulty
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Показываем результат
+                    passwordText.textContent = data.password;
+
+                    // Обновляем информацию о пароле
+                    let infoText = `Длина: ${data.length} символов | `;
+                    infoText += data.difficulty === 'easy' ? 'Только буквы' : 'Буквы, цифры и специальные символы';
+                    passwordInfo.textContent = infoText;
+
+                    // Обновляем индикатор сложности
+                    strengthFill.className = 'password-strength-fill';
+                    strengthFill.classList.add(data.difficulty === 'easy' ? 'strength-easy' : 'strength-hard');
+
+                    // Показываем блок с результатом
+                    resultDiv.style.display = 'block';
+
+                    // Анимация появления
+                    resultDiv.style.opacity = '0';
+                    resultDiv.style.transform = 'translateY(20px)';
+
+                    setTimeout(() => {
+                        resultDiv.style.opacity = '1';
+                        resultDiv.style.transform = 'translateY(0)';
+                        resultDiv.style.transition = 'all 0.5s ease';
+                    }, 10);
+                } else {
+                    alert('Ошибка при генерации пароля: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Произошла ошибка при генерации пароля');
+            })
+            .finally(() => {
+                // Скрываем индикатор загрузки
+                btnText.style.display = 'inline';
+                btnLoading.style.display = 'none';
+                generateBtn.disabled = false;
+            });
+        });
+
+        // Функция копирования пароля
+        function copyPassword() {
+            const password = passwordText.textContent;
+            const copyBtn = document.querySelector('.copy-btn');
+
+            navigator.clipboard.writeText(password).then(function() {
+                // Визуальная обратная связь
+                const originalHTML = copyBtn.innerHTML;
+                copyBtn.innerHTML = '✅';
+                copyBtn.style.backgroundColor = '#4CAF50';
+                copyBtn.style.color = 'white';
+
+                setTimeout(function() {
+                    copyBtn.innerHTML = originalHTML;
+                    copyBtn.style.backgroundColor = '';
+                    copyBtn.style.color = '';
+                }, 2000);
+            }).catch(function(err) {
+                console.error('Ошибка при копировании: ', err);
+                alert('Не удалось скопировать пароль');
+            });
+        }
+
+        // Генерируем пароль при загрузке страницы
+        window.addEventListener('load', function() {
+            generateBtn.click();
+        });
+    </script>
+</body>
+</html>
