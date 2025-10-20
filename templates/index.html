@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор паролей</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .tab-container {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+        }
+        
+        .tab.active {
+            background: white;
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="password"],
+        input[type="email"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .password-display {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-size: 18px;
+            text-align: center;
+            word-break: break-all;
+            border: 1px dashed #ddd;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .option-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .option-item input {
+            margin-right: 8px;
+        }
+        
+        .user-list {
+            margin-top: 20px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+        
+        .user-item {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .message {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 600px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Генератор паролей</h1>
+        
+        <div class="tab-container">
+            <div class="tab active" data-tab="generator">Генератор</div>
+            <div class="tab" data-tab="register">Регистрация</div>
+            <div class="tab" data-tab="users">Пользователи</div>
+        </div>
+        
+        <div class="tab-content active" id="generator">
+            <h2>Сгенерировать пароль</h2>
+            
+            <div class="form-group">
+                <label for="password-length">Длина пароля:</label>
+                <input type="number" id="password-length" min="6" max="50" value="12">
+            </div>
+            
+            <div class="options">
+                <div class="option-item">
+                    <input type="checkbox" id="uppercase" checked>
+                    <label for="uppercase">Заглавные буквы (A-Z)</label>
+                </div>
+                <div class="option-item">
+                    <input type="checkbox" id="lowercase" checked>
+                    <label for="lowercase">Строчные буквы (a-z)</label>
+                </div>
+                <div class="option-item">
+                    <input type="checkbox" id="numbers" checked>
+                    <label for="numbers">Цифры (0-9)</label>
+                </div>
+                <div class="option-item">
+                    <input type="checkbox" id="symbols">
+                    <label for="symbols">Спецсимволы (!@#$%^&*)</label>
+                </div>
+            </div>
+            
+            <button id="generate-btn">Сгенерировать пароль</button>
+            
+            <div class="password-display" id="password-display">
+                Ваш пароль появится здесь
+            </div>
+            
+            <button id="copy-btn">Копировать пароль</button>
+        </div>
+        
+        <div class="tab-content" id="register">
+            <h2>Регистрация пользователя</h2>
+            
+            <div class="form-group">
+                <label for="username">Имя пользователя:</label>
+                <input type="text" id="username" placeholder="Введите имя пользователя">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" placeholder="Введите email">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" placeholder="Введите пароль">
+            </div>
+            
+            <button id="register-btn">Зарегистрироваться</button>
+            
+            <div id="register-message"></div>
+        </div>
+        
+        <div class="tab-content" id="users">
+            <h2>Зарегистрированные пользователи</h2>
+            
+            <div class="user-list" id="user-list">
+                <!-- Список пользователей будет здесь -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Переключение между вкладками
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Убираем активный класс у всех вкладок и содержимого
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Добавляем активный класс к выбранной вкладке и содержимому
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Генератор паролей
+        document.getElementById('generate-btn').addEventListener('click', generatePassword);
+        document.getElementById('copy-btn').addEventListener('click', copyPassword);
+
+        function generatePassword() {
+            const length = parseInt(document.getElementById('password-length').value);
+            const uppercase = document.getElementById('uppercase').checked;
+            const lowercase = document.getElementById('lowercase').checked;
+            const numbers = document.getElementById('numbers').checked;
+            const symbols = document.getElementById('symbols').checked;
+            
+            if (length < 6 || length > 50) {
+                alert('Длина пароля должна быть от 6 до 50 символов');
+                return;
+            }
+            
+            if (!uppercase && !lowercase && !numbers && !symbols) {
+                alert('Выберите хотя бы один тип символов');
+                return;
+            }
+            
+            const uppercaseChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const lowercaseChars = 'abcdefghijklmnopqrstuvwxyz';
+            const numberChars = '0123456789';
+            const symbolChars = '!@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            let allowedChars = '';
+            if (uppercase) allowedChars += uppercaseChars;
+            if (lowercase) allowedChars += lowercaseChars;
+            if (numbers) allowedChars += numberChars;
+            if (symbols) allowedChars += symbolChars;
+            
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * allowedChars.length);
+                password += allowedChars[randomIndex];
+            }
+            
+            document.getElementById('password-display').textContent = password;
+        }
+
+        function copyPassword() {
+            const password = document.getElementById('password-display').textContent;
+            if (password === 'Ваш пароль появится здесь') {
+                alert('Сначала сгенерируйте пароль');
+                return;
+            }
+            
+            navigator.clipboard.writeText(password)
+                .then(() => {
+                    alert('Пароль скопирован в буфер обмена');
+                })
+                .catch(err => {
+                    console.error('Ошибка копирования: ', err);
+                    alert('Не удалось скопировать пароль');
+                });
+        }
+
+        // Регистрация пользователей
+        document.getElementById('register-btn').addEventListener('click', registerUser);
+
+        function registerUser() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !email || !password) {
+                showMessage('register-message', 'Все поля обязательны для заполнения', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('register-message', 'Пароль должен содержать не менее 6 символов', 'error');
+                return;
+            }
+            
+            // Получаем существующих пользователей из localStorage
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            
+            // Проверяем, существует ли пользователь с таким именем или email
+            const userExists = users.some(user => user.username === username || user.email === email);
+            
+            if (userExists) {
+                showMessage('register-message', 'Пользователь с таким именем или email уже существует', 'error');
+                return;
+            }
+            
+            // Добавляем нового пользователя
+            users.push({
+                username,
+                email,
+                password // В реальном приложении пароль должен быть зашифрован!
+            });
+            
+            // Сохраняем в localStorage
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // Очищаем форму
+            document.getElementById('username').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('password').value = '';
+            
+            showMessage('register-message', 'Пользователь успешно зарегистрирован', 'success');
+            
+            // Обновляем список пользователей
+            displayUsers();
+        }
+
+        function showMessage(elementId, message, type) {
+            const messageElement = document.getElementById(elementId);
+            messageElement.textContent = message;
+            messageElement.className = 'message ' + type;
+        }
+
+        // Отображение списка пользователей
+        function displayUsers() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const userList = document.getElementById('user-list');
+            
+            if (users.length === 0) {
+                userList.innerHTML = '<p>Нет зарегистрированных пользователей</p>';
+                return;
+            }
+            
+            userList.innerHTML = users.map(user => `
+                <div class="user-item">
+                    <strong>Имя:</strong> ${user.username}<br>
+                    <strong>Email:</strong> ${user.email}
+                </div>
+            `).join('');
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            displayUsers();
+        });
+    </script>
+</body>
+</html>
