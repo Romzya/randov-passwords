@@ -3,6 +3,7 @@
  <img width="1013" height="738" alt="image" src="https://github.com/user-attachments/assets/1ff64524-ca7e-4163-88b4-f77377fc77cb" />
 
 <h2>Структура проекта</h2>
+
 ```text
 ├── app.py               
 ├── templates/
