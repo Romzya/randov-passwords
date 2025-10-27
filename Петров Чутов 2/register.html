@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Регистрация</title>
+</head>
+<body>
+    <h1>Регистрация</h1>
+    
+    <form action="/register" method="POST">
+        <div>
+            <label>Имя пользователя:</label>
+            <input type="text" name="username" required>
+        </div>
+        <br>
+        
+        <div>
+            <label>Пароль:</label>
+            <input type="password" name="password" required>
+        </div>
+        <br>
+        
+        <div>
+            <label>Email:</label>
+            <input type="email" name="email" required>
+        </div>
+        <br>
+        
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+    
+    <br>
+    <a href="login.html">Уже есть аккаунт? Войти</a>
+    <br>
+    <a href="index.html">На главную</a>
+</body>
+</html>
