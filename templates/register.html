@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация - Генератор паролей</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Регистрация</h1>
+        
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        <form method="POST">
+            <div class="form-group">
+                <label for="username">Имя пользователя:</label>
+                <input type="text" id="username" name="username" required>
+                <small>От 3 до 20 символов (только буквы, цифры и подчеркивания)</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль:</label>
+                <input type="password" id="password" name="password" required>
+                <small>Минимум 6 символов</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirm_password">Подтвердите пароль:</label>
+                <input type="password" id="confirm_password" name="confirm_password" required>
+            </div>
+            <div style="position: fixed;bottom: 0; left: 0; right: 0; text-align: center;">
+                © 2025 Петров Роман Чутов Кирилл
+            </div>
+            
+            <button type="submit">Зарегистрироваться</button>
+        </form>
+        
+        <p>Уже есть аккаунт? <a href="{{ url_for('login') }}">Войти</a></p>
+    </div>
+</body>
+</html>

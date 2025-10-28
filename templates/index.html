@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор паролей</title>
+</head>
+<body>
+    <p>Пользователь: {{ username }}</p>
+    <a href="/logout">Выйти</a>
+    <div class="container">
+        <h1>Генератор безопасных паролей</h1>
+        
+        <div class="settings">
+            <div class="setting-group">
+                <label for="length">Длина пароля:</label>
+                <input type="number" id="length" min="4" max="128" value="12">
+            </div>
+            
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" id="uppercase" checked>
+                    Заглавные буквы (A-Z)
+                </label>
+            </div>
+            
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" id="lowercase" checked>
+                    Строчные буквы (a-z)
+                </label>
+            </div>
+            
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" id="numbers" checked>
+                    Цифры (0-9)
+                </label>
+            </div>
+            
+            <div class="setting-group">
+                <label>
+                    <input type="checkbox" id="special" checked>
+                    Специальные символы
+                </label>
+            </div>
+            
+            <div class="setting-group">
+                <label for="special_chars">Специальные символы:</label>
+                <input type="text" id="special_chars" value="!@#$%^&*">
+            </div>
+            
+            <div class="setting-group">
+                <label for="count">Количество паролей:</label>
+                <input type="number" id="count" min="1" max="20" value="1">
+            </div>
+        </div>
+        
+        <div class="buttons">
+            <button onclick="generatePassword()">Сгенерировать пароль</button>
+            <button onclick="generateMultiplePasswords()">Сгенерировать несколько</button>
+            <button onclick="copyToClipboard()">Копировать</button>
+        </div>
+        
+        <div class="result">
+            <h3>Результат:</h3>
+            <textarea id="passwordResult" rows="6" readonly></textarea>
+        </div>
+    </div>
+
+        <div class="result">
+            <button onclick="generatePassword()">Да</button>
+
+        </div>
+    </div>
+    <div style="position: fixed;bottom: 0; left: 0; right: 0; text-align: center;">
+        © 2025 Петров Роман Чутов Кирилл
+    </div>
+
+    <script>
+        async function generatePassword() {
+            const settings = getSettings();
+            
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(settings)
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    document.getElementById('passwordResult').value = 'Ошибка: ' + data.error;
+                } else {
+                    document.getElementById('passwordResult').value = data.password;
+                }
+            } catch (error) {
+                document.getElementById('passwordResult').value = 'Ошибка: ' + error.message;
+            }
+        }
+        
+        async function generateMultiplePasswords() {
+            const settings = getSettings();
+            settings.count = parseInt(document.getElementById('count').value);
+            try {
+                const response = await fetch('/generate_multiple', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(settings)
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    document.getElementById('passwordResult').value = 'Ошибка: ' + data.error;
+                } else {
+                    document.getElementById('passwordResult').value = data.passwords.join('\n');
+                }
+            } catch (error) {
+                document.getElementById('passwordResult').value = 'Ошибка: ' + error.message;
+            }
+        }
+        
+        function getSettings() {
+            return {
+                length: parseInt(document.getElementById('length').value),
+                uppercase: document.getElementById('uppercase').checked,
+                lowercase: document.getElementById('lowercase').checked,
+                numbers: document.getElementById('numbers').checked,
+                special: document.getElementById('special').checked,
+                special_chars: document.getElementById('special_chars').value
+            };
+        }
+        
+        function copyToClipboard() {
+            const textarea = document.getElementById('passwordResult');
+            textarea.select();
+            document.execCommand('copy');
+            alert('Пароль скопирован в буфер обмена');
+        }
+    </script>
+</body>
+</html>
